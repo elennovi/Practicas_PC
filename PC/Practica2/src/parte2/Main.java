@@ -1,7 +1,8 @@
 package parte2;
 
 public class Main {
-	private static final int M = 500;
+	private static final int M = 100;
+	private static final int N = 10;
 	
 	public static void main(String[] args) throws InterruptedException {
 		// El array para los threads de los dos tipos
@@ -17,9 +18,9 @@ public class Main {
 		// La creacion de cada uno de los incrementadores decrementadores
 		int id = 1;
 		for (int i = 0; i < M; i++) {
-			icrem[i] = new Incrementador(id, lock, e);
+			icrem[i] = new Incrementador(id, lock, e, N);
 			++id;
-			dcrem[i] = new Decrementador(id, lock, e);
+			dcrem[i] = new Decrementador(id, lock, e, N);
 			++id;
 		}
 		
@@ -34,6 +35,9 @@ public class Main {
 			icrem[i].join();
 			dcrem[i].join();
 		}
+		
+		// Mostramos el valor final 
+		System.out.println("El valor final es: " + e.getValue());
 	}
 
 }

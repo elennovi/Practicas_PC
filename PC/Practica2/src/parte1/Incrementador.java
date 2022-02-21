@@ -2,23 +2,21 @@ package parte1;
 import java.lang.Thread;
 
 public class Incrementador extends Thread {
-	VarsCompartidas vars;
+	private VarsCompartidas vars;
+	private int N;
+	private LockRompeEmpate lock;
+	private static final int id = 1;
 	
-	Incrementador(VarsCompartidas vars){
+	Incrementador(VarsCompartidas vars, LockRompeEmpate lock, int N){
 		this.vars = vars;
+		this.N = N;
+		this.lock = lock;
 	}
 	
 	public void run() {
-		while(true) {
-			// Ha entrado el proceso 1 a ejecución
-			vars.setIn1(true);
-			vars.setLast(1);
-			// Await
-			while(vars.isIn2() && vars.getLast() == 1);
-			// Entrada a la seccion critica
+		lock.takeLock(id);
+		for (int i = 0; i < N; i++)
 			vars.incrementa();
-			// Salimos de la seccion critica
-			vars.setIn1(false);
-		}
+		lock.releaseLock(id);
 	}
 }

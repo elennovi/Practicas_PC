@@ -2,23 +2,21 @@ package parte1;
 import java.lang.Thread;
 
 public class Decrementador extends Thread {
-	VarsCompartidas vars;
+	private VarsCompartidas vars;
+	private int N;
+	private LockRompeEmpate lock;
+	private static final int id = 2;
 	
-	Decrementador(VarsCompartidas vars){
+	Decrementador(VarsCompartidas vars, LockRompeEmpate lock, int N){
 		this.vars = vars;
+		this.lock = lock;
+		this.N = N;
 	}
 	
 	public void run() {
-		while(true) {
-			// El proceso dos ha entrado a ejecutar
-			vars.setIn2(true);
-			vars.setLast(2);
-			// Await
-			while(vars.isIn1() && vars.getLast() == 2);
-			// Entrada a la seccion critica
+		lock.takeLock(id);
+		for (int i = 0; i < N; i++)
 			vars.decrementa();
-			// Salida de la seccion critica
-			vars.setIn2(false);
-		}
+		lock.releaseLock(id);
 	}
 }
