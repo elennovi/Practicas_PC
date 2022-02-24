@@ -2,11 +2,11 @@ package parte2;
 
 public class Decrementador extends Thread {
 	private int i;
-	private LockRompeEmpate lock;
+	private Lock lock;
 	private Entero e;
 	private int N;
 	
-	Decrementador(int i, LockRompeEmpate lock, Entero e, int N) {
+	Decrementador(int i, Lock lock, Entero e, int N) {
 		this.i = i;
 		this.lock = lock;
 		this.e = e;
