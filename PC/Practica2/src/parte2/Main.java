@@ -9,8 +9,10 @@ public class Main {
 		Incrementador[] icrem = new Incrementador[M];
 		Decrementador[] dcrem = new Decrementador[M];
 		
-		// El lock
-		LockRompeEmpate lock = new LockRompeEmpate(2 * M);
+		// Los locks
+		LockRompeEmpate rompedor = new LockRompeEmpate(2 * M);
+		LockBakery croisant = new LockBakery(2 * M);
+		LockTicket puchito = new LockTicket(2 * M);
 		
 		// El entero que se incrementa y se decrementa
 		Entero e = new Entero();
@@ -18,9 +20,9 @@ public class Main {
 		// La creacion de cada uno de los incrementadores decrementadores
 		int id = 1;
 		for (int i = 0; i < M; i++) {
-			icrem[i] = new Incrementador(id, lock, e, N);
+			icrem[i] = new Incrementador(id, rompedor, e, N);
 			++id;
-			dcrem[i] = new Decrementador(id, lock, e, N);
+			dcrem[i] = new Decrementador(id, rompedor, e, N);
 			++id;
 		}
 		
