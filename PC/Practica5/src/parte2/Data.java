@@ -1,5 +1,6 @@
 package parte2;
 
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,18 @@ public class Data {
 				return s;
 		// no existe el fichero en la base de datos
 		return null;
+	}
+	
+	// devuelve el fout del cliente indicado por parametros
+	public ObjectOutputStream getFoutOf(String idClient) {
+		return infoClientes.get(idClient).getFout();
+	}
+
+	public void eliminarCliente(String idClient) {
+		// Eliminamos al cliente del mapa que contiene los flujos de entrada y de salida
+		infoClientes.remove(idClient);
+		// Eliminamos al cliente del mapa que contiene los archivos que esta ofreciendo
+		ficherosClientes.remove(idClient);
 	}
 	
 }
