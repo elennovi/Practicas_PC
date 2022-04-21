@@ -13,8 +13,8 @@ public class Msg_Conexion extends Mensaje{
 		this.user = user;
 	}
 	
-	public List<String> getInfoUser(){
-		return user.getFicheros();
+	public List<String> getFilenames(){
+		return user.getFilenames();
 	}
 	
 	public String getNameUser() {

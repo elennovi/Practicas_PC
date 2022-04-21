@@ -33,7 +33,7 @@ public class OyenteCliente extends Thread{
 					Msg_Conexion mc = (Msg_Conexion)m;
 					// Guardar info user
 					// Envío por el fout de msg_conf_conexion
-					datos.addCliente(mc.getNameUser(), new InfoCliente(mc.getNameUser(), fin, fout), mc.getInfoUser());
+					datos.addCliente(mc.getNameUser(), new InfoCliente(mc.getNameUser(), fin, fout), mc.getFilenames());
 					fout.writeObject(new Msg_Conf_Conexion(m.getDestino(), m.getOrigen()));
 					fout.flush();
 					
