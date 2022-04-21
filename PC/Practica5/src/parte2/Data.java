@@ -41,11 +41,14 @@ public class Data {
 		return infoClientes.get(idClient).getFout();
 	}
 
-	public void eliminarCliente(String idClient) {
+	public boolean eliminarCliente(String idClient) {
+		if (!infoClientes.containsKey(idClient))
+			return false; // Si no existe el cliente
 		// Eliminamos al cliente del mapa que contiene los flujos de entrada y de salida
 		infoClientes.remove(idClient);
 		// Eliminamos al cliente del mapa que contiene los archivos que esta ofreciendo
 		ficherosClientes.remove(idClient);
+		return true; // Hemos podido borrar el cliente porque ya existía
 	}
 	
 }

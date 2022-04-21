@@ -10,10 +10,10 @@ import java.util.Scanner;
 public class Cliente {
 	static Scanner scanner = new Scanner(System.in);
 	
-	public static void main(String[] args) {
-		
+	public static void main(String[] args) throws IOException {
+		Socket s = null;
 		try {
-			Socket s = new Socket("localhost", 999);
+			s = new Socket("localhost", 5000);
 			BufferedReader fin = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			PrintWriter fout = new PrintWriter(s.getOutputStream());
 			// Input del usuario por consola
@@ -22,9 +22,9 @@ public class Cliente {
 			fout.flush();
 			String contenido = fin.readLine();
 			System.out.println("El contenido del fichero es:\n" + contenido + "\n");
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		s.close();
 	}
 }

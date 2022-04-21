@@ -3,7 +3,7 @@ package parte2;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class InfoCliente { // DUDA
+public class InfoCliente {
 	private ObjectInputStream fin;
 	private ObjectOutputStream fout;
 	

@@ -14,11 +14,13 @@ public class Servidor {
 	// Base de archivos
 	static Map<String, String> archivos = new HashMap<String, String>();
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		inserta_archivos();
+		ServerSocket listen = null;
+		Socket ss = null;
 		try {
-			ServerSocket listen = new ServerSocket(999);
-			Socket ss = listen.accept();
+			listen = new ServerSocket(999);
+			ss = listen.accept();
 			BufferedReader fin = new BufferedReader(new InputStreamReader(ss.getInputStream()));
 			PrintWriter fout = new PrintWriter(ss.getOutputStream());
 			// Recibe el nombre del fichero de texto
@@ -30,6 +32,8 @@ public class Servidor {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		listen.close();
+		ss.close();
 	}
 	
 	public static void inserta_archivos() {
