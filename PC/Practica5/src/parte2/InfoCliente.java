@@ -6,10 +6,12 @@ import java.io.ObjectOutputStream;
 public class InfoCliente {
 	private ObjectInputStream fin;
 	private ObjectOutputStream fout;
+	private String ipv4;
 	
-	public InfoCliente(String nombre, ObjectInputStream fin, ObjectOutputStream fout) {
+	public InfoCliente(String nombre, String ipv4, ObjectInputStream fin, ObjectOutputStream fout) {
 		this.setFin(fin);
 		this.setFout(fout);
+		this.ipv4 = ipv4;
 	}
 
 	public ObjectInputStream getFin() {
@@ -26,6 +28,10 @@ public class InfoCliente {
 
 	public void setFout(ObjectOutputStream fout) {
 		this.fout = fout;
+	}
+
+	public String getIP() {
+		return ipv4;
 	}
 	
 }

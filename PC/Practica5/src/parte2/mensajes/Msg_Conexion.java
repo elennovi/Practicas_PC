@@ -21,4 +21,8 @@ public class Msg_Conexion extends Mensaje{
 		return user.getName();
 	}
 	
+	public String getIP() {
+		return user.getIP();
+	}
+	
 }
