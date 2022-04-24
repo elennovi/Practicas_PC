@@ -5,35 +5,26 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.Semaphore;
 
 import parte2.mensajes.*;
 
 public class OyenteServidor extends Thread{
-	private Socket s = null ;
+	private Socket s;
 	private Usuario user;
 	private ObjectInputStream fin;
 	private ObjectOutputStream fout;
+	private Semaphore sem;
 	
-	public OyenteServidor(Socket s, Usuario user) {
+	public OyenteServidor(Socket s, ObjectInputStream fin, ObjectOutputStream fout, Usuario user, Semaphore sem) {
 		this.s = s;
 		this.user = user;
-		try {
-			fin = new ObjectInputStream((this.s).getInputStream());
-			fout = new ObjectOutputStream((this.s).getOutputStream());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.fin = fin;
+		this.fout = fout;
+		this.sem = sem;
 	}
 	
 	public void run() {
-		// Lo primero que hay que hacer es mandar un mensaje de conexion con el servidor
-		try {
-			fout.writeObject(new Msg_Conexion(user.getName(), "servidor", user));
-			fout.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		while(true) {
 			try {
 				Mensaje m = (Mensaje)fin.readObject();
@@ -41,12 +32,14 @@ public class OyenteServidor extends Thread{
 				case Constantes.MSG_CONF_CONEXION:
 					// Mostramos un mensaje indicando que ya ha sido confirmada la conexion
 					System.out.println("El usuario " + m.getDestino() + " se ha conectado a " + m.getOrigen());
+					sem.release();
 					break;
 				case Constantes.MSG_CONF_LISTA_USERS:
 					// Mostramos la lista de usuarios devuelta por el servidor
 					Msg_Conf_Lista_Users mclu = (Msg_Conf_Lista_Users) m;
 					System.out.println("La lista de usuarios que ha mandado el " + m.getOrigen() + ": \n" 
 							+ mclu.getListaUsers().toString());
+					sem.release();
 					break;
 				case Constantes.MSG_PREPARADO_SERVIDOR_CLIENTE:
 					// Obtenemos el cliente, el puerto y la IP
@@ -60,6 +53,7 @@ public class OyenteServidor extends Thread{
 					Receptor receptor = new Receptor(s, cliente);
 					receptor.start();
 					receptor.join(); // Esperamos a que el receptor haya acabado de recibir la informacion
+					sem.release();
 					s.close();
 					break;
 				case Constantes.MSG_CONF_CERRAR_CONEXION:
@@ -74,10 +68,22 @@ public class OyenteServidor extends Thread{
 					// Crear emisor  (el server socket y el accept)
 					ServerSocket ss = new ServerSocket(port);
 					Socket s1 = ss.accept(); // Esperamos a que el receptor esté listo
+					Emisor emisor = new Emisor(s1, user.getInfoFile(filename));
+					emisor.start();
+					emisor.join(); // Esperamos a que acabe de emitir el fichero
+					ss.close(); // Cerramos el server socket
 					// Envio mensaje indicando que se ha preparado cliente servidor
 					fout.writeObject(new Msg_Preparado_Cliente_Servidor(m.getDestino(), m.getOrigen(), user.getIP(), port));
 					fout.flush();
 					break;
+				case Constantes.MSG_ERROR:
+					Msg_Error me = (Msg_Error) m;
+					// Obtenemos el mensaje de error obtenido y lo mostramos
+					System.out.println(me.getMensajeError());
+					System.out.println("Pruebe a conectarse más tarde.");
+					(this.s).close();
+					sem.release();
+					return;
 				}
 			} catch (ClassNotFoundException | IOException e) {
 				// TODO Auto-generated catch block

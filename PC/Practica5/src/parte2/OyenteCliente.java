@@ -12,13 +12,16 @@ public class OyenteCliente extends Thread{
 	private Data datos; 
 	private ObjectInputStream fin;
 	private ObjectOutputStream fout;
-
+	private Lock lock;
+	private int numPuerto = Constantes.INI_PUERTO;
+	
 	public OyenteCliente(Socket s, Data datos) {
 		this.s = s;
 		this.datos = datos;
+		this.lock = new LockRompeEmpate(Constantes.NUM_MAX_PUERTOS);
 		try {
-			fin = new ObjectInputStream(s.getInputStream());
-			fout = new ObjectOutputStream(s.getOutputStream());
+			fin = new ObjectInputStream((this.s).getInputStream());
+			fout = new ObjectOutputStream((this.s).getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -55,7 +58,7 @@ public class OyenteCliente extends Thread{
 						// Obtenemos el fout del cliente en cuestion
 						ObjectOutputStream fout2 = datos.getFoutOf(cliente2);
 						// Mandamos un mensaje para emitir fichero por ese fout
-						fout2.writeObject(new Msg_Emitir_Fichero(m.getOrigen(), cliente2, mpf.getFileName(), /* Añadir puerto con locks*/));
+						fout2.writeObject(new Msg_Emitir_Fichero(m.getOrigen(), cliente2, mpf.getFileName(), nuevoPuerto()));
 						fout2.flush();
 					}
 				
@@ -84,5 +87,15 @@ public class OyenteCliente extends Thread{
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public int nuevoPuerto() {
+		// Cogemos el lock para que nadie utilice el mismo puerto que nosotros
+		lock.takeLock(numPuerto - Constantes.INI_PUERTO + 1);
+		int port = numPuerto;
+		numPuerto++; // Fetch and add del puerto actual
+		// Ya pueden entrar otros a coger el puerto
+		lock.releaseLock(numPuerto - Constantes.INI_PUERTO + 1);
+		return port;
 	}
 }
