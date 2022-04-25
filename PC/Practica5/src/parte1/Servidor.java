@@ -3,6 +3,8 @@ package parte1;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,17 +21,17 @@ public class Servidor {
 		ServerSocket listen = null;
 		Socket ss = null;
 		try {
-			listen = new ServerSocket(999);
+			listen = new ServerSocket(5000);
 			ss = listen.accept();
-			BufferedReader fin = new BufferedReader(new InputStreamReader(ss.getInputStream()));
-			PrintWriter fout = new PrintWriter(ss.getOutputStream());
+			ObjectOutputStream fout = new ObjectOutputStream(ss.getOutputStream());
+			ObjectInputStream fin = new ObjectInputStream(ss.getInputStream());
 			// Recibe el nombre del fichero de texto
-			String nombre = fin.readLine();
+			String nombre =(String) fin.readObject();
 			// Busca el archivo en la base
 			String contenido = archivos.get(nombre);
-			fout.println(contenido);
+			fout.writeObject((Object) contenido);
 			fout.flush();
-		} catch (IOException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		listen.close();

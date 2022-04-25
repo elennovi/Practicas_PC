@@ -3,6 +3,7 @@ package parte2.mensajes;
 import parte2.Constantes;
 
 public class Msg_Pedir_Fichero extends Mensaje {
+	private static final long serialVersionUID = 1L;
 	// El nombre del fichero que se tiene que emitir
 	private String fichero;
 	

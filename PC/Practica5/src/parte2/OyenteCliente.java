@@ -20,32 +20,35 @@ public class OyenteCliente extends Thread{
 		this.datos = datos;
 		this.lock = new LockRompeEmpate(Constantes.NUM_MAX_PUERTOS);
 		try {
-			fin = new ObjectInputStream((this.s).getInputStream());
 			fout = new ObjectOutputStream((this.s).getOutputStream());
+			fin = new ObjectInputStream((this.s).getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void run() {
+		System.out.println("Se ha creado el oyente cliente");
 		while(true) {
 			try {
 				Mensaje m = (Mensaje)fin.readObject();
 				switch(m.getTipo()) {
 				case Constantes.MSG_CONEXION:
+					System.out.println("Al servidor le llega un mensaje de conexion");
 					Msg_Conexion mc = (Msg_Conexion)m;
 					// Guardar info user
 					datos.addCliente(mc.getNameUser(), new InfoCliente(mc.getNameUser(), mc.getIP(), fin, fout), mc.getFilenames());
 					// Envío por el fout de msg_conf_conexion
 					fout.writeObject(new Msg_Conf_Conexion(m.getDestino(), m.getOrigen()));
 					fout.flush();
-					
+					System.out.println("El servidor ha mandado el mensaje de confirmacion de conexion");
+					break;
 				case Constantes.MSG_LISTA_USERS:
 					// Recopilar info, meter en una ED para mandarla
 					// Envío msg_conf_lista_usr con info
 					fout.writeObject(new Msg_Conf_Lista_Users(m.getDestino(), m.getOrigen(), datos.getListaUsers()));
 					fout.flush();
-					
+					break;
 				case Constantes.MSG_PEDIR_FICHERO:
 					Msg_Pedir_Fichero mpf = (Msg_Pedir_Fichero) m;
 					// Buscamos al cliente con esa info
@@ -61,7 +64,7 @@ public class OyenteCliente extends Thread{
 						fout2.writeObject(new Msg_Emitir_Fichero(m.getOrigen(), cliente2, mpf.getFileName(), nuevoPuerto()));
 						fout2.flush();
 					}
-				
+					break;
 				case Constantes.MSG_PREPARADO_CLIENTE_SERVIDOR:
 					Msg_Preparado_Cliente_Servidor mpcs = (Msg_Preparado_Cliente_Servidor) m;
 					// Obtener el fout del cliente al que va dirigido el mensaje
@@ -69,7 +72,7 @@ public class OyenteCliente extends Thread{
 					// Enviamos mensaje preparado servidor cliente
 					fout1.writeObject(new Msg_Preparado_Servidor_Cliente(m.getOrigen(), m.getDestino(), mpcs.getIP(), mpcs.getPuerto()));
 					fout1.flush();
-					
+					break;
 				case Constantes.MSG_CERRAR_CONEXION:
 					// Eliminamos al usuario de todas las tablas
 					if (!datos.eliminarCliente(m.getOrigen())) {
@@ -81,7 +84,7 @@ public class OyenteCliente extends Thread{
 					// Mandamos un mensaje de confirmacion del cierre de la conexion
 					fout.writeObject(new Msg_Conf_Cerrar_Conexion(m.getDestino(), m.getOrigen()));
 					fout.flush();
-					break;
+					return; // Termina el oyente cliente (ya no hay cliente al que escuchar)
 				}
 			} catch (ClassNotFoundException | IOException e) {
 				e.printStackTrace();

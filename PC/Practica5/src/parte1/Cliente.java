@@ -3,6 +3,8 @@ package parte1;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
@@ -14,15 +16,15 @@ public class Cliente {
 		Socket s = null;
 		try {
 			s = new Socket("localhost", 5000);
-			BufferedReader fin = new BufferedReader(new InputStreamReader(s.getInputStream()));
-			PrintWriter fout = new PrintWriter(s.getOutputStream());
+			ObjectOutputStream fout = new ObjectOutputStream(s.getOutputStream());
+			ObjectInputStream fin = new ObjectInputStream(s.getInputStream());
 			// Input del usuario por consola
 			String name = scanner.nextLine();
-			fout.println(name);
+			fout.writeObject((Object)name);
 			fout.flush();
-			String contenido = fin.readLine();
+			String contenido = (String) fin.readObject();
 			System.out.println("El contenido del fichero es:\n" + contenido + "\n");
-		} catch (IOException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		s.close();

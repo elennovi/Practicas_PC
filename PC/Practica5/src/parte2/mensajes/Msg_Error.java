@@ -3,6 +3,7 @@ package parte2.mensajes;
 import parte2.Constantes;
 
 public class Msg_Error extends Mensaje {
+	private static final long serialVersionUID = 1L;
 	private String mensajeError;
 	
 	public Msg_Error(String origen, String destino, String error) {

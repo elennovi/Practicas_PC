@@ -3,6 +3,7 @@ package parte2.mensajes;
 import parte2.Constantes;
 
 public class Msg_Preparado_Servidor_Cliente extends Mensaje {
+	private static final long serialVersionUID = 1L;
 	private String ip;
 	private int puerto;
 

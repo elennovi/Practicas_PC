@@ -6,7 +6,7 @@ import java.util.Map;
 import parte2.Constantes;
 
 public class Msg_Conf_Lista_Users extends Mensaje{
-	
+	private static final long serialVersionUID = 1L;
 	private Map<String, List<String>> mapa;
 
 	public Msg_Conf_Lista_Users(String origen, String destino, Map<String, List<String>> mapa) {

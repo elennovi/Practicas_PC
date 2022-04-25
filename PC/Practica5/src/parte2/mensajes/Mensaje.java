@@ -1,6 +1,10 @@
 package parte2.mensajes;
 
-public abstract class Mensaje {
+import java.io.Serializable;
+
+public abstract class Mensaje implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	// Atributos: tipo, origen, destino, pero lo más importante, camino
 	private int tipo;
 	private String origen;

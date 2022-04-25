@@ -3,22 +3,25 @@ package parte2;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Servidor {
 	
 	private static ServerSocket listen;
-	private static List<Socket> sockets = new ArrayList<Socket>();
 
 	public static void main(String[] args) {
+		System.out.println("Servidor creado");
 		// Los datos del server
 		Data datos = new Data();
+		try {
+			listen = new ServerSocket(999);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		while(true) {
 			try {
-				listen = new ServerSocket(999);
-				sockets.add(listen.accept());
-				(new OyenteCliente(sockets.get(sockets.size() - 1), datos)).start();
+				Socket s = listen.accept();
+				(new OyenteCliente(s, datos)).start();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

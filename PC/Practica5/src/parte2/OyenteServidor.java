@@ -25,6 +25,7 @@ public class OyenteServidor extends Thread{
 	}
 	
 	public void run() {
+		sem.release();
 		while(true) {
 			try {
 				Mensaje m = (Mensaje)fin.readObject();
@@ -59,7 +60,7 @@ public class OyenteServidor extends Thread{
 				case Constantes.MSG_CONF_CERRAR_CONEXION:
 					// Cerrar el socket
 					(this.s).close();
-					break;
+					return;
 				case Constantes.MSG_EMITIR_FICHERO:
 					Msg_Emitir_Fichero mef = (Msg_Emitir_Fichero) m;
 					// Conseguimos el nombre del fichero que debemos emitir y el puerto
