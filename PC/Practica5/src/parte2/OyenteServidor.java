@@ -53,9 +53,8 @@ public class OyenteServidor extends Thread{
 					// Creamos un nuevo thread receptor
 					Receptor receptor = new Receptor(s, cliente);
 					receptor.start();
-					receptor.join(); // Esperamos a que el receptor haya acabado de recibir la informacion
+					receptor.join(); // Esperamos a que acaben de comunicarse para dejar paso a una nueva peticion
 					sem.release();
-					s.close();
 					break;
 				case Constantes.MSG_CONF_CERRAR_CONEXION:
 					// Cerrar el socket
@@ -66,16 +65,16 @@ public class OyenteServidor extends Thread{
 					// Conseguimos el nombre del fichero que debemos emitir y el puerto
 					String filename = mef.getFilename();
 					int port = mef.getPuerto();
-					// Crear emisor  (el server socket y el accept)
+					// Creamos el serversocket
 					ServerSocket ss = new ServerSocket(port);
+					// Envio mensaje indicando que se ha preparado cliente servidor
+					fout.reset();
+					fout.writeObject(new Msg_Preparado_Cliente_Servidor(m.getDestino(), m.getOrigen(), user.getIP(), port));
+					fout.flush();
+					// Esperamos a que el emisor quiera realizar una conexion con nosotros
 					Socket s1 = ss.accept(); // Esperamos a que el receptor esté listo
 					Emisor emisor = new Emisor(s1, user.getInfoFile(filename));
 					emisor.start();
-					emisor.join(); // Esperamos a que acabe de emitir el fichero
-					ss.close(); // Cerramos el server socket
-					// Envio mensaje indicando que se ha preparado cliente servidor
-					fout.writeObject(new Msg_Preparado_Cliente_Servidor(m.getDestino(), m.getOrigen(), user.getIP(), port));
-					fout.flush();
 					break;
 				case Constantes.MSG_ERROR:
 					Msg_Error me = (Msg_Error) m;
@@ -86,10 +85,7 @@ public class OyenteServidor extends Thread{
 					sem.release();
 					return;
 				}
-			} catch (ClassNotFoundException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
+			} catch (ClassNotFoundException | IOException | InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

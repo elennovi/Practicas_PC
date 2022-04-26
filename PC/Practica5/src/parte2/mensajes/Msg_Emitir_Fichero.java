@@ -10,6 +10,7 @@ public class Msg_Emitir_Fichero extends Mensaje{
 	public Msg_Emitir_Fichero(String origen, String destino, String filename, int puerto) {
 		super(Constantes.MSG_EMITIR_FICHERO, origen, destino);
 		this.puerto = puerto;
+		this.filename = filename;
 	}
 	
 	public String getFilename() {

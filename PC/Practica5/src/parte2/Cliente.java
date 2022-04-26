@@ -6,12 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,20 +21,12 @@ public class Cliente {
 	// Info static del cliente
 	private static Scanner scanner = new Scanner(System.in);
 	private static String name; // El nombre del usuario
-	private static String ipv4; // La ip del cliente actual
 
 	public static void main(String[] args) {
 		// Leer nombre del teclado
 		System.out.print("Introduzca su nombre de usuario: ");
 		name = scanner.nextLine();
 		System.out.println();
-		
-		/*
-		// Leer el nombre del servidor al que se quiere conectar
-		System.out.print("Introduzca el nombre del servidor: ");
-		String serverName = scanner.nextLine();
-		System.out.println();
-		*/
 		
 		// Leer los ficheros que aporta el cliente
 		System.out.println("Introduzca el nombre de los ficheros (FIN para acabar): ");
@@ -58,25 +46,6 @@ public class Cliente {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-//		// Obtenemos su ip para utilizarla más adelante en el intercambio de ficheros
-//		try {
-//			// Obtenemos las interfaces
-//			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-//			// Le pedimos al usuario que introduzca la interfaz en la que está
-//			System.out.print("Interfaces asociadas: " + interfaces);
-//			String selectedI = scanner.nextLine();
-//			// Obtenemos esa interfaz y buscamos una dirección ip version 4
-//			NetworkInterface i = NetworkInterface.getByName(selectedI);
-//			Enumeration<InetAddress> addressesI = i.getInetAddresses();
-//	        InetAddress ip = addressesI.nextElement();
-//	        // Extraemos la primera direcccion del tipo ipv4
-//	        while (ip instanceof Inet4Address)
-//	            ip = addressesI.nextElement();
-//	        ipv4 = ip.toString().substring(1, ip.toString().length());
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 		
 		// Crear Sockets con el server
 		Socket s = null;
@@ -130,16 +99,22 @@ public class Cliente {
 			try {
 				switch(op) {
 				case Constantes.OP_CONSULTAR_USUARIOS:
+					fout.reset();
 					fout.writeObject(new Msg_Lista_Users(name, "servidor"));
+					fout.flush();
 					break;
 				case Constantes.OP_PEDIR_FICHERO:
 					// Le pide al usuario el nombre del fichero que quiere conseguir
 					System.out.print("Nombre del fichero deseado: ");
 					String fichero = scanner.nextLine();
+					fout.reset();
 					fout.writeObject(new Msg_Pedir_Fichero(name, "servidor", fichero));
+					fout.flush();
 					break;
 				case Constantes.OP_CERRAR_SESION:
+					fout.reset();
 					fout.writeObject(new Msg_Cerrar_Conexion(name, "servidor"));
+					fout.flush();
 					acaba = true;
 					break;
 				default: // Ha seleccionado una opcion no valida

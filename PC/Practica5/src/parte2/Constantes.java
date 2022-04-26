@@ -13,7 +13,7 @@ public final class Constantes {
 	public static final int MSG_EMITIR_FICHERO = 10;
 	public static final int MSG_ERROR = 11;
 	public static final int NUM_MAX_PUERTOS = 100;
-	public static final int INI_PUERTO = 5000;
+	public static final int INI_PUERTO = 1000;
 	public static final String ERROR_CERRAR_CONEXION = "Primero debe establecer la conexión con el servidor";
 	public static final String ERROR_PEDIR_FICHERO = "El fichero que ha pedido no existe";
 	public static final String MENU = "__________      _________\n"
