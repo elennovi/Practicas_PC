@@ -1,3 +1,5 @@
+// ELENA NOVILLO LUCEÑO
+// ESTIBALIZ ZUBIMENDI SOLAGUREN
 package parte2;
 
 import java.io.IOException;
@@ -7,22 +9,21 @@ import java.net.Socket;
 public class Servidor {
 	
 	private static ServerSocket listen;
-	private static volatile Data datos = new Data();
+	private static Data datos = new Data();
 
 	public static void main(String[] args) {
 		System.out.println("Servidor creado");
-		// Los datos del server
-		
 		try {
+			// Escuchamos por el puerto indicado
 			listen = new ServerSocket(999);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		while(true) {
-			datos = datos; // Actualizamos los datos por si ha habido alguna modificacion
 			try {
+				// Esperamos a que un cliente quiera comunicarse con nosotros
 				Socket s = listen.accept();
+				// Generamos un oyenteCliente para le nuevo cliente
 				(new OyenteCliente(s, datos)).start();
 			} catch (IOException e) {
 				e.printStackTrace();

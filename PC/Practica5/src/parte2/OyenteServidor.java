@@ -25,6 +25,7 @@ public class OyenteServidor extends Thread{
 	}
 	
 	public void run() {
+		// Indicamos al cliente que ya estamos escuchando
 		sem.release();
 		while(true) {
 			try {
@@ -33,6 +34,7 @@ public class OyenteServidor extends Thread{
 				case Constantes.MSG_CONF_CONEXION:
 					// Mostramos un mensaje indicando que ya ha sido confirmada la conexion
 					System.out.println("El usuario " + m.getDestino() + " se ha conectado a " + m.getOrigen());
+					// El cliente ya puede mostrar el menú
 					sem.release();
 					break;
 				case Constantes.MSG_CONF_LISTA_USERS:
@@ -40,6 +42,7 @@ public class OyenteServidor extends Thread{
 					Msg_Conf_Lista_Users mclu = (Msg_Conf_Lista_Users) m;
 					System.out.println("La lista de usuarios que ha mandado el " + m.getOrigen() + ": \n" 
 							+ mclu.getListaUsers().toString());
+					// El cliente ya puede mostrar el menú
 					sem.release();
 					break;
 				case Constantes.MSG_PREPARADO_SERVIDOR_CLIENTE:
@@ -53,7 +56,9 @@ public class OyenteServidor extends Thread{
 					// Creamos un nuevo thread receptor
 					Receptor receptor = new Receptor(s, cliente);
 					receptor.start();
-					receptor.join(); // Esperamos a que acaben de comunicarse para dejar paso a una nueva peticion
+					// Esperamos a que acaben de comunicarse para dejar paso a una nueva peticion
+					receptor.join(); 
+					// El cliente ya puede mostrar el menú
 					sem.release();
 					break;
 				case Constantes.MSG_CONF_CERRAR_CONEXION:
@@ -67,12 +72,12 @@ public class OyenteServidor extends Thread{
 					int port = mef.getPuerto();
 					// Creamos el serversocket
 					ServerSocket ss = new ServerSocket(port);
-					// Envio mensaje indicando que se ha preparado cliente servidor
+					// Enviamos un Msg_Preparado_Cliente_Servidor
 					fout.reset();
 					fout.writeObject(new Msg_Preparado_Cliente_Servidor(m.getDestino(), m.getOrigen(), user.getIP(), port));
 					fout.flush();
 					// Esperamos a que el emisor quiera realizar una conexion con nosotros
-					Socket s1 = ss.accept(); // Esperamos a que el receptor esté listo
+					Socket s1 = ss.accept(); 
 					Emisor emisor = new Emisor(s1, user.getInfoFile(filename));
 					emisor.start();
 					break;
@@ -80,10 +85,9 @@ public class OyenteServidor extends Thread{
 					Msg_Error me = (Msg_Error) m;
 					// Obtenemos el mensaje de error obtenido y lo mostramos
 					System.out.println(me.getMensajeError());
-					System.out.println("Pruebe a conectarse más tarde.");
-					(this.s).close();
+					// El cliente ya puede mostrar el menú
 					sem.release();
-					return;
+					break;
 				}
 			} catch (ClassNotFoundException | IOException | InterruptedException e) {
 				// TODO Auto-generated catch block

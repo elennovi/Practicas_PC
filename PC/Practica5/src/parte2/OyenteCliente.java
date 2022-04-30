@@ -35,35 +35,37 @@ public class OyenteCliente extends Thread{
 				case Constantes.MSG_CONEXION:
 					System.out.println("Al servidor le llega un mensaje de conexion");
 					Msg_Conexion mc = (Msg_Conexion)m;
-					// Guardar info user
+					// Guardamos la información del usuario
 					datos.addCliente(mc.getNameUser(), new InfoCliente(mc.getNameUser(), mc.getIP(), fin, fout), mc.getFilenames());
-					// Envío por el fout de msg_conf_conexion
+					// Enviamos por el fout el Msg_Conf_Conexion
 					fout.reset();
 					fout.writeObject(new Msg_Conf_Conexion(m.getDestino(), m.getOrigen()));
 					fout.flush();
 					System.out.println("El servidor ha mandado el mensaje de confirmacion de conexion");
 					break;
 				case Constantes.MSG_LISTA_USERS:
-					// Recopilar info, meter en una ED para mandarla
-					// Envío msg_conf_lista_usr con info
+					// Recopilamos la información en un Map
 					Map<String, List<String>> mapaActual =  datos.getListaUsers();
 					fout.reset();
+					// Enviamos un Msg_Conf_Lista_Users con la información pedida
 					fout.writeObject(new Msg_Conf_Lista_Users(m.getDestino(), m.getOrigen(), mapaActual));
 					fout.flush();
 					break;
 				case Constantes.MSG_PEDIR_FICHERO:
 					Msg_Pedir_Fichero mpf = (Msg_Pedir_Fichero) m;
-					// Buscamos al cliente con esa info
+					// Buscamos al cliente que tiene ese fichero
 					String cliente2 = datos.getFicheroCliente(mpf.getFileName());
+					// Si no lo hemos encontrado mandamos un mensaje de eror
 					if(cliente2 == null) {
 						fout.reset();
 						fout.writeObject(new Msg_Error(m.getDestino(), m.getOrigen(), Constantes.ERROR_PEDIR_FICHERO));
 						fout.flush();
 					}
+					// Si lo hemos encontrado debemos pedirle al cliente encontrado que emita el fichero
 					else {
 						// Obtenemos el fout del cliente en cuestion
 						ObjectOutputStream fout2 = datos.getFoutOf(cliente2);
-						// Mandamos un mensaje para emitir fichero por ese fout
+						// Mandamos un Msg_Emitir_Fichero por ese fout
 						fout2.reset();
 						// Conseguimos el nuevo puerto para la comunicacion entre ambos clientes
 						int nuevoPuerto = datos.nuevoPuerto();
@@ -73,27 +75,27 @@ public class OyenteCliente extends Thread{
 					break;
 				case Constantes.MSG_PREPARADO_CLIENTE_SERVIDOR:
 					Msg_Preparado_Cliente_Servidor mpcs = (Msg_Preparado_Cliente_Servidor) m;
-					// Obtener el fout del cliente al que va dirigido el mensaje
+					// Obtenemos el fout del cliente al que va dirigido el mensaje
 					ObjectOutputStream fout1 = datos.getFoutOf(m.getDestino());
-					// Enviamos mensaje preparado servidor cliente
+					// Enviamos un Msg_Preparado_Servidor_Cliente
 					fout1.reset();
 					fout1.writeObject(new Msg_Preparado_Servidor_Cliente(m.getOrigen(), m.getDestino(), mpcs.getIP(), mpcs.getPuerto()));
 					fout1.flush();
 					break;
 				case Constantes.MSG_CERRAR_CONEXION:
 					// Eliminamos al usuario de todas las tablas
+					// Si no hemos podido eliminarlo
 					if (!datos.eliminarCliente(m.getOrigen())) {
-						// Como no está el cliente le indicamos que ha habido un erorr
 						fout.reset();
 						fout.writeObject(new Msg_Error(m.getDestino(), m.getOrigen(), Constantes.ERROR_CERRAR_CONEXION));
 						fout.flush();
-						return; // No está el cliente por lo que ese oyente cliente acaba
+						return;
 					}
-					// Mandamos un mensaje de confirmacion del cierre de la conexion
+					// Mandamos un Msg_Conf_Cerrar_Conexion
 					fout.reset();
 					fout.writeObject(new Msg_Conf_Cerrar_Conexion(m.getDestino(), m.getOrigen()));
 					fout.flush();
-					return; // Termina el oyente cliente (ya no hay cliente al que escuchar)
+					return; 
 				}
 			} catch (ClassNotFoundException | IOException e) {
 				e.printStackTrace();

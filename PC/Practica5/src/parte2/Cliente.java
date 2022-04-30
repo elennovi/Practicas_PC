@@ -1,3 +1,5 @@
+// ELENA NOVILLO LUCEÑO
+// ESTIBALIZ ZUBIMENDI SOLAGUREN
 package parte2;
 
 import java.io.BufferedReader;
@@ -17,18 +19,16 @@ import java.util.concurrent.Semaphore;
 import parte2.mensajes.*;
 
 public class Cliente {
-	
-	// Info static del cliente
 	private static Scanner scanner = new Scanner(System.in);
 	private static String name; // El nombre del usuario
 
 	public static void main(String[] args) {
-		// Leer nombre del teclado
+		// Leemos el nombre del usuario por teclado
 		System.out.print("Introduzca su nombre de usuario: ");
 		name = scanner.nextLine();
 		System.out.println();
 		
-		// Leer los ficheros que aporta el cliente
+		// Leemos los ficheros que aporta el cliente por teclado
 		System.out.println("Introduzca el nombre de los ficheros (FIN para acabar): ");
 		List<String> filenames = new ArrayList<String>();
 		String filename = scanner.nextLine();
@@ -43,22 +43,21 @@ public class Cliente {
 		try {
 			 ficheros = recogeInfoFicheros(filenames);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
-		// Crear Sockets con el server
+		// Creamos los sockets con el servidor
 		Socket s = null;
 		try {
-			s = new Socket("localhost", 999);
+			// Suponemos que tanto servidor como cliente están ejecutandose desde la misma máquina
+			s = new Socket("localhost", 999); 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		// Crear un thread OyenteServidor
-		Semaphore sem = new Semaphore(0); // Un semáforo para generar orden a la hora de pedir al usuario una opción
-		// y mostrar la solución
+		// Un semáforo para generar orden a la hora de pedir al usuario una opción y mostrar la respuesta del servidor
+		Semaphore sem = new Semaphore(0); 
+		// Creamos un OyenteServidor y los flujos para la comunicación
 		OyenteServidor oyenteServer = null;
 		ObjectInputStream fin = null;
 		ObjectOutputStream fout = null;
@@ -75,54 +74,58 @@ public class Cliente {
 		
 		// Lo primero que hay que hacer es mandar un mensaje de conexion con el servidor
 		try {
-			sem.acquire();
+			// Esperaremos a que el OyenteServidor nos indique que ya está escuchando
+			sem.acquire(); 
 			fout.writeObject((Object) new Msg_Conexion(name, "servidor", user));
 			fout.flush();
 		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		// Menú user
+		// Mostramos el menú de usuario hasta que se cierre la conexion
 		boolean acaba = false;
 		while(!acaba) {
 			try {
+				// Esperamos a que el OyenteServidor responda a las peticiones correspondientes (si las hubiera)
 				sem.acquire();
 			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+			
 			System.out.println(Constantes.MENU);
 			// Pedimos al usuario la opcion que quiere ejecutar
 			System.out.print("Introduzca el numero de la opcion: ");
 			String op = scanner.nextLine();
 			try {
 				switch(op) {
+				// Le pide al servidor una lista con los usuarios y sus correspondientes ficheros aportados
 				case Constantes.OP_CONSULTAR_USUARIOS:
 					fout.reset();
 					fout.writeObject(new Msg_Lista_Users(name, "servidor"));
 					fout.flush();
 					break;
+				// Le pide al servidor el contenido de un fichero
 				case Constantes.OP_PEDIR_FICHERO:
-					// Le pide al usuario el nombre del fichero que quiere conseguir
+					// Pedimos al usuario el nombre del fichero en cuestión
 					System.out.print("Nombre del fichero deseado: ");
 					String fichero = scanner.nextLine();
 					fout.reset();
 					fout.writeObject(new Msg_Pedir_Fichero(name, "servidor", fichero));
 					fout.flush();
 					break;
+				// Le pide al servidor confirmación para cerrar conexión
 				case Constantes.OP_CERRAR_SESION:
 					fout.reset();
 					fout.writeObject(new Msg_Cerrar_Conexion(name, "servidor"));
 					fout.flush();
 					acaba = true;
 					break;
-				default: // Ha seleccionado una opcion no valida
+				// En cualquier otro caso, no existe esa opción
+				default: 
 					System.out.println("Esa opción no existe.");
 					sem.release();
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				scanner.close();
 				return;
@@ -140,7 +143,8 @@ public class Cliente {
 				String ln;
 				while ((ln = br.readLine()) != null)
 					text += ln + "\n";
-				ficheros.put(fn, text); // Guardamos en el mapa el fichero con su contenido
+				// Guardamos en el mapa el fichero con su contenido
+				ficheros.put(fn, text); 
 			}
 		}
 		return ficheros;

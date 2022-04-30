@@ -4,7 +4,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MiMonitor {
-	private int nw = 0, nr = 0; // El numero de escritores y el numero de lectores
+	// El numero de escritores y el numero de lectores
+	private int nw = 0, nr = 0;
 	private final ReentrantLock l = new ReentrantLock();
 	private final Condition okToRead = l.newCondition();
 	private final Condition okToWrite = l.newCondition();
@@ -15,7 +16,6 @@ public class MiMonitor {
 			try {
 				okToRead.wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		nr++;
@@ -35,7 +35,6 @@ public class MiMonitor {
 			try {
 				okToWrite.wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		nw++;

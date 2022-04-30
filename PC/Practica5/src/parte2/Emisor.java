@@ -9,13 +9,12 @@ public class Emisor extends Thread {
 	private Socket s;
 	private String textFile;
 	private ObjectOutputStream fout;
-	private ObjectInputStream fin;
 	
 	public Emisor(Socket s1, String textFile) {
 		try {
 			this.s = s1;
 			fout = new ObjectOutputStream((this.s).getOutputStream());
-			fin = new ObjectInputStream((this.s).getInputStream());
+			new ObjectInputStream((this.s).getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -23,13 +22,12 @@ public class Emisor extends Thread {
 	}
 	
 	public void run() {
-		// Debemos mandar el contenido por el 
+		// Mandamos el contenido del fichero al cliente receptor
 		try {
 			fout.reset();
 			fout.writeObject(textFile);
 			fout.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

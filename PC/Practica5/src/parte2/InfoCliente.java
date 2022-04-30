@@ -4,8 +4,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class InfoCliente {
+	// Flujos de entrada y de salida
 	private ObjectInputStream fin;
 	private ObjectOutputStream fout;
+	// IP del cliente
 	private String ipv4;
 	
 	public InfoCliente(String nombre, String ipv4, ObjectInputStream fin, ObjectOutputStream fout) {
